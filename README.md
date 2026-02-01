@@ -4,8 +4,6 @@
 
 Build an **Activity Tracker Widget** using **only HTML, CSS and Vanilla JavaScript**. The widget must track user activity (page views, button clicks, form submissions) and display them in a **timeline** widget that can expand/collapse.
 
-This specification is deliberately **exact** about class names, text labels, formats and behavior so the implementation will pass the provided Playwright tests.
-
 -----
 
 ## Getting Started and Project Setup 
@@ -65,220 +63,60 @@ To properly test the **cross-page persistence** via `localStorage`, you **cannot
 
 ## Implementation Requirements
 
-This project is a strict test of compliance and functionality. Students **must** implement the following core requirements exactly as specified in the technical document:
+Students **must** implement the following:
 
-### 1. Data Persistence and Session Management (Mandatory Logic)
+### Mandatory Requirement: ActivityTracker Class
 
-* **Cross-Page Persistence:** The entire session state (events, stats, etc.) **must** be stored in and restored from **`localStorage`** using a key like `activity-tracker-data`.
-* **Session ID Generation:** A unique `Session ID` must be generated upon the first load, following the exact format: `session_<digits>_<alphanum>` (e.g., `session_1727895123456_ab12cd`). This section is invalidated after 1 hour of inactivity from the user. Upon returning to the page after this time a new session and new events should be stored.
-* **Immediate Updates:** `localStorage` must be updated **immediately** after every tracked event (page view, click, form submission).
+* **Class Implementation:** The primary logic **must** be encapsulated within an **`ActivityTracker` class** defined in `activity-tracker.js`.
+* **Instantiation:** The `ActivityTracker` class **must** be instantiated on `DOMContentLoaded`.
+* **Event Delegation:** Use event delegation (a single listener high in the DOM tree) for tracking user interactions rather than attaching multiple individual listeners.
+* **Code Quality:** Follow best practices discussed in class and modern JavaScript standards (e.g., proper error handling, clear variable naming, organized methods).
 
-### 2. Event Tracking and Statistics (Mandatory Functionality)
+### Core Functionality Requirements
 
-* **Page View Tracking:** Automatically record a page view event on every page load. The event details must include the page name (e.g., `Visited: products.html`).
-* **Targeted Click Tracking:** A single, delegated event listener must detect clicks on elements with the **exact class `.btn-primary`**. This must increment **`Total Clicks`** and create a specific timeline entry including the exact substring: `Clicked link: Shop Now`.
-* **Form Submission Tracking:** Detect and record the submission of **any** `<form>` element, which must increment **`Forms Submitted`** and add an interaction entry.
-* **Statistic Rendering:** The four session statistics (`Session Duration`, `Pages Viewed`, `Total Clicks`, `Forms Submitted`) must be rendered in the **exact specified order** and format within the `.session-stats` container.
+Your implementation should provide the following capabilities:
 
-### 3. DOM Structure and Presentation (Mandatory Compliance)
+1. **Activity Tracking** — Track and record the following user activities:
+   - Page view events on page load
+   - Click events (you may define the clickable elements)
+   - Form submission events
 
-* **Exact HTML Structure:** The widget must render the **required HTML structure and class hierarchy** for the header, stats, and timeline (e.g., `.activity-tracker-widget` containing `.activity-tracker-timeline`, which in turn contains `.timeline-header`, etc.).
-* **Timeline Toggle:** Clicking the `.activity-tracker-button` must **only** add or remove the class **`.expanded`** from the `.activity-tracker-timeline` element.
-* **Fixed Scrollability:** The element with class `.timeline-content` **must** have the exact required CSS properties: `overflow-y: auto` and `max-height: 350px`.
-* **Timestamp Format:** All timestamps (in the header and in timeline items) must use the 24-hour format: **`HH:MM:SS`**.
+2. **Session Management** — Generate a unique session identifier on first load that persists across pages.
 
-### 4. Code Quality (Mandatory Best Practices)
+3. **Data Persistence** — Store and retrieve session data from `localStorage` to maintain state across page navigation.
 
-* **Class Structure:** The primary logic **must** be encapsulated within the **`ActivityTracker` class** and instantiated on `DOMContentLoaded`.
-* **Event Delegation:** Use the recommended method of attaching a single listener high in the DOM tree for tracking user interactions, rather than attaching many individual listeners.
-* **Best practices:** The code should follow the best practices discussed in class, as well as follow modern Javascript code standards.
+4. **Statistics** — Maintain counts for tracked activities (e.g., pages viewed, clicks, forms submitted, session duration).
+
+5. **Timeline Display** — Display tracked events in a visual timeline format that can be toggled (shown/hidden).
 
 ---
 
 ## Required file structure
 
 - `activity-tracker.js` — main script (should define `ActivityTracker` class and instantiate it on DOM ready).
-- `activity-tracker.css` — stylesheet (inline `<style>` is allowed if the CSS rules are identical).
-- `demo/index.html` — homepage for testing.
-- `demo/products.html` — secondary page for navigation tests.
+- `activity-tracker.css` — all styles must be defined within this file, inline styles will not be considered.
 
-Both demo pages must:
 
-- Load `activity-tracker.js`.
-- Immediately render an element with class `.activity-tracker-widget`.
-- Contain the button shown below (exact class and text):
-
-```html
-<button class="btn-primary">Shop Now</button>
-```
+> ⚠️ **ATTENTION:** Students are **not allowed to modify** the files inside the `/demo` folder, with the **only exception** being to include the links/references to `activity-tracker.js` and `activity-tracker.css`. Any other modifications to the demo files are considered violations of the assignment requirements.
 
 ---
 
-## Required HTML structure (must be present exactly)
 
-The widget must render the following structure on every page (class names and hierarchy are required):
+## Suggested Implementation Details
 
-```html
-<div class="activity-tracker-widget">
-  <button class="activity-tracker-button" aria-label="Open activity timeline">
-    🕒
-  </button>
+While the specific HTML structure and CSS class names are **not** mandatory, here are suggestions for organizing your implementation:
 
-  <aside class="activity-tracker-timeline">
-    <header class="timeline-header">
-      <h3>Activity Timeline</h3>
-      <div>
-        <div>Session ID: session_1234567890_ab12cd</div>
-        <div>Started: 14:22:18</div>
-      </div>
-    </header>
-    <section class="session-stats">
-      <div class="stat">
-        <div class="stat-label">Session Duration</div>
-        <div class="stat-value">0 min</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Pages Viewed</div>
-        <div class="stat-value">1</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Total Clicks</div>
-        <div class="stat-value">0</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Forms Submitted</div>
-        <div class="stat-value">0</div>
-      </div>
-    </section>
 
-    <div class="timeline-content">
-      <div class="timeline-wrapper">
-        <!-- timeline-item entries appended here -->
-        <div class="timeline-item pageview">
-          <div class="time">14:22:20</div>
-          <div class="event-title">Page View</div>
-          <div class="event-details">Visited: index.html — 45% viewed</div>
-        </div>
-      </div>
-    </div>
-  </aside>
-</div>
-```
+## Persistence
 
----
+- Use `localStorage` to persist session data between page navigations (e.g., from `index.html` to `products.html`).
+- Choose a reasonable key name (e.g., `activity-tracker-data`).
+- On page load, check if existing session data is in `localStorage`:
+  - If present, restore the timeline and stats from the stored data.
+  - If not, initialize a new session.
+- Update `localStorage` immediately after recording new events.
 
-## Required class/content rules (exact expectations)
-
-### Widget and button
-
-- `.activity-tracker-widget` must always exist in the DOM.
-- `.activity-tracker-button` toggles the timeline visibility.
-- When open, `.activity-tracker-timeline` **must have** the class `.expanded`.
-
-### Timeline header
-
-- The header must contain a `<h3>` with the text **Activity Timeline**.
-- The header must include exactly two `<div>` elements (direct children of the header's inner `<div>`):
-
-  1. `Session ID: session_<digits>_<alphanum>` (example: `Session ID: session_1727895123456_ab12cd`). The regex the tests expect: `session_\d+_\w+`.
-  2. `Started: HH:MM:SS` (example: `Started: 14:22:18`). The regex the tests expect: `Started: \d{1,2}:\d{2}:\d{2}`.
-
-### Session statistics
-
-- `.session-stats` must contain **exactly four** `.stat` elements.
-- The **order and exact label text** must be:
-
-  1. `Session Duration` — value like `0 min` (must match `\d+ min`).
-  2. `Pages Viewed` — numeric value.
-  3. `Total Clicks` — numeric value.
-  4. `Forms Submitted` — numeric value.
-
-- Each `.stat` must contain `.stat-label` and `.stat-value` sub-elements.
-
-### Timeline content
-
-- `.timeline-content` must have these CSS properties:
-
-```css
-.timeline-content {
-  overflow-y: auto;
-  max-height: 350px;
-}
-```
-
-- `.timeline-wrapper` contains `.timeline-item` entries.
-- Each `.timeline-item` (including pageviews and interactions) must include:
-
-  - `.time` — format `HH:MM:SS` (24-hour). Tests accept `HH:MM` or `HH:MM:SS`, but prefer `HH:MM:SS`.
-  - `.event-title` — e.g. `Page View`, `Interaction`.
-  - `.event-details` — descriptive string (for example `Clicked link: Shop Now`).
-
-Example interaction entry (exact phrase included in tests):
-
-```html
-<div class="timeline-item interaction">
-  <div class="time">14:23:01</div>
-  <div class="event-title">Interaction</div>
-  <div class="event-details">Clicked link: Shop Now</div>
-</div>
-```
-
-### Searchable text
-
-- Timeline content must include words such as `button`, `click` or `interaction` when user actions occur — tests run a regex match like `/button|click|interaction/i`.
-
----
-
-## Required behavior and logic (must implement)
-
-### Timeline toggle
-
-- Clicking `.activity-tracker-button` must add/remove the class `.expanded` on `.activity-tracker-timeline`.
-
-### Event tracking
-
-You must detect and record the following events **immediately** (or within 500ms):
-
-1. **Page view**
-
-   - Automatically record on page load.
-   - Create a `.timeline-item.pageview` with `.event-details` that includes the page name (e.g. `Visited: products.html`).
-
-2. **Button click**
-
-   - Clicking `.btn-primary` must:
-
-     - Append a `.timeline-item.interaction`.
-     - Increment `Total Clicks` in `.session-stats`.
-     - Include `.event-details` with the exact substring: `Clicked link: Shop Now`.
-
-3. **Form submission**
-
-   - Submitting any `<form>` must increment `Forms Submitted` and add an `.interaction` entry.
-
-### Statistics update rules
-
-- Update session stats after each relevant event:
-
-  - `Total Clicks` — increment on button/link clicks.
-  - `Pages Viewed` — increment on page loads (persisted across pages).
-  - `Forms Submitted` — increment when forms are submitted.
-  - `Session Duration` — display minutes since session start, in the format `\d+ min`.
-
-### Timestamp format
-
-- Use `HH:MM:SS` (24-hour) for all timestamps in header and timeline items.
-
-### CSS scrollability
-
-- `.timeline-content` must have `overflow-y: auto` and `max-height: 350px`.
-
----
-
-## Persistence (mandatory)
-
-- Use `localStorage` with a key like `activity-tracker-data` to persist session data between `index.html` and `products.html`.
-- Recommended data format (JSON):
+**Recommended data structure (JSON):**
 
 ```js
 {
@@ -286,103 +124,51 @@ You must detect and record the following events **immediately** (or within 500ms
     "startedAt": 1727895123456,
     "events": [
         { "type": "pageview", "page": "index.html", "time": 1727895123456 },
-        { "type": "interaction", "details": "Clicked link: Shop Now", "time": 1727895130000 }
+        { "type": "click", "details": "...", "time": 1727895130000 }
     ]
 }
 ```
 
-- On page load, the script must:
-
-  - Read `localStorage` key.
-  - If present, reload the timeline and stats from stored data.
-  - Continue writing new events into the same store.
-
 ---
 
-## Test compliance checklist (mapping to Playwright tests)
+## Implementation Recommendations
 
-- **Timeline header information**
-
-  - `.activity-tracker-button` toggles `.expanded` on `.activity-tracker-timeline`.
-  - `<h3>` contains `Activity Timeline`.
-  - First header div contains `Session ID: session_\d+_\w+`.
-  - Second header div contains `Started: HH:MM:SS`.
-
-- **Activity tracking display**
-
-  - Clicking `.btn-primary` adds `.timeline-item.interaction` and updates DOM.
-  - `.timeline-wrapper` contains text matching `button|click|interaction`.
-
-- **Session statistics display**
-
-  - `.session-stats` exists and has 4 `.stat` items in required order and labels.
-  - `Total Clicks` increments when `.btn-primary` is clicked.
-  - `Session Duration` matches `\d+ min`.
-  - `Pages Viewed` increases after navigation.
-
-- **Timeline content scrolling**
-
-  - `.timeline-content` has `overflow-y: auto` and `max-height: 350px`.
-
-- **Page navigation tracking**
-
-  - Clicking a link to `products.html` registers a pageview entry containing `page|view|products`.
-
-- **Button click timeline entries**
-
-  - The number of `.timeline-item` entries increases after clicking `.btn-primary`.
-  - The added `.timeline-item` has `.event-title` containing `Interaction` and `.event-details` containing `Clicked link: Shop Now`.
-
-- **Persistence**
-
-  - Events persist across navigation via `localStorage` and reappear after page load.
-
-- **Timestamps**
-
-  - `.timeline-item .time` matches `\d{1,2}:\d{2}(:\d{2})?` (prefer `HH:MM:SS`).
-
----
-
-## Implementation recommendations
-
-- JS class skeleton recommendation:
-
+**Class Structure:**
 ```js
 class ActivityTracker {
   constructor() {
-    /* generate sessionId, startedAt, load store, render */
+    // Initialize: load from localStorage or create new session
+    // Render the widget
+    // Attach event listeners
   }
+  
+  // Methods to handle:
+  // - Recording page views
+  // - Tracking user interactions
+  // - Updating statistics
+  // - Persisting to localStorage
+  // - Rendering/updating the UI
 }
 
 document.addEventListener("DOMContentLoaded", () => new ActivityTracker());
 ```
 
-- Generate session ID like:
-
+**Event Delegation Example:**
 ```js
-`session_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+document.addEventListener("click", (e) => {
+  // Check if the clicked element matches your tracked elements
+  // Record the event
+  // Update localStorage
+}, true);
 ```
 
-- Use event delegation for capturing clicks:
-
-```js
-document.addEventListener(
-  "click",
-  (e) => {
-    /* detect .btn-primary and links */
-  },
-  true
-);
-```
-
-- Update DOM and `localStorage` immediately after each event (within 500ms at most).
-- Ensure the `.activity-tracker-timeline` gets the `expanded` class when toggled.
+**Key Practices:**
+- Update both the DOM and `localStorage` immediately after each event.
+- Use a toggle mechanism to show/hide the timeline widget.
+- Include descriptive information in timeline entries (timestamps, event type, details).
+- Validate that the `ActivityTracker` class is properly instantiated on page load.
 
 ---
-
-## Summary
-
-Follow this specification exactly. The Playwright tests will fail if: class names differ, label text does not match, CSS rules for `.timeline-content` differ, timestamp formats differ, Session ID format differs, or `localStorage` persistence is missing.
 
 ## Grading
 | Grade | Completeness: Is the project fulfilling all the technical specifications?                                                                                                                                                                                      | Correctness: Are the test passing and the logic correct?                                                                                                                                                                                                                 | Maintainability: Is the code documented, organized, and follow best practices discussed in class?                                                                                                                                                                                                              | Performance: Is the code efficient?                                                                                                                                                                                                                                                |

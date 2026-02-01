@@ -1,5 +1,5 @@
 class ActivityTracker {
-   // TODO
+    // IMPLEMENT YOUR CODE HERE
 }
 
 // Export the class
