@@ -1,10 +1,10 @@
 
-/* #activity-tracker-widget {
+#activity-tracker-widget {
     position: fixed;
     bottom: 20px;
     right: 20px;
     width: 320px;
-    background: hsl(0, 0%, 7%);
+    background: #111;
     color: #fff;
     font-family: Arial, sans-serif;
     border-radius: 8px;
@@ -14,7 +14,7 @@
 }
 
 #tracker-header {
-    background: #007bff;;
+    background: #007bff;
     padding: 10px 15px;
     display: flex;
     justify-content: space-between;
@@ -56,4 +56,4 @@
     font-size: 0.8rem;
     padding: 6px 0;
     border-bottom: 1px solid rgba(255,255,255,0.1);
-}*/
+}
