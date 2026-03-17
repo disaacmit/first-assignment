@@ -9,7 +9,7 @@ class ActivityTracker {
         this.attachEventListeners();
         this.updateUI();
     }
-    
+
     loadOrCreateSession() {
         const existing = localStorage.getItem(this.storageKey);
 
@@ -35,7 +35,6 @@ class ActivityTracker {
         localStorage.setItem(this.storageKey, JSON.stringify(this.data));
     }
 
-
     recordEvent(type, details = {}) {
         const event = {
             type,
@@ -50,21 +49,40 @@ class ActivityTracker {
 
     recordPageView() {
         this.recordEvent('pageview', {
-            page: window.location.pathname.split('/').pop()
+            page: window.location.pathname.split('/').pop() || 'home'
         });
     }
 
-   
     attachEventListeners() {
+
         document.addEventListener('click', (e) => {
+
             const target = e.target.closest('a, button');
 
-            if (target) {
+            if (target && !target.classList.contains('delete-event')) {
                 this.recordEvent('click', {
                     element: target.tagName,
                     text: target.textContent.trim().slice(0, 50)
                 });
             }
+
+            if (e.target.id === 'tracker-toggle') {
+                document.getElementById('tracker-body').classList.toggle('hidden');
+            }
+
+            if (e.target.id === 'tracker-close') {
+                document.getElementById('tracker-body').classList.add('hidden');
+            }
+
+            if (e.target.id === 'clear-events') {
+                this.clearEvents();
+            }
+
+            if (e.target.classList.contains('delete-event')) {
+                const index = e.target.dataset.index;
+                this.deleteEvent(index);
+            }
+
         }, true);
 
         document.addEventListener('submit', (e) => {
@@ -72,13 +90,18 @@ class ActivityTracker {
                 formId: e.target.id || 'unknown'
             });
         }, true);
+    }
 
-        document.addEventListener('click', (e) => {
-            if (e.target.id === 'tracker-toggle') {
-                document.getElementById('tracker-body')
-                    .classList.toggle('hidden');
-            }
-        });
+    deleteEvent(index) {
+        this.data.events.splice(index, 1);
+        this.persist();
+        this.updateUI();
+    }
+
+    clearEvents() {
+        this.data.events = [];
+        this.persist();
+        this.updateUI();
     }
 
     getStats() {
@@ -99,17 +122,26 @@ class ActivityTracker {
     }
 
     renderWidget() {
+
         if (document.getElementById('activity-tracker-widget')) return;
 
         const widget = document.createElement('div');
         widget.id = 'activity-tracker-widget';
+
         widget.innerHTML = `
             <div id="tracker-header">
                 <span>Activity Tracker</span>
-                <button id="tracker-toggle">Click Here</button>
+                <div>
+                    <button id="tracker-toggle">Toggle</button>
+                    <button id="tracker-close">Close</button>
+                </div>
             </div>
+
             <div id="tracker-body">
                 <div id="tracker-stats"></div>
+
+                <button id="clear-events">Clear Activities</button>
+
                 <ul id="tracker-timeline"></ul>
             </div>
         `;
@@ -123,6 +155,7 @@ class ActivityTracker {
     }
 
     updateStats() {
+
         const stats = this.getStats();
         const container = document.getElementById('tracker-stats');
 
@@ -136,28 +169,32 @@ class ActivityTracker {
     }
 
     updateTimeline() {
+
         const timeline = document.getElementById('tracker-timeline');
         timeline.innerHTML = '';
 
-        this.data.events.slice().reverse().forEach(event => {
+        this.data.events.slice().reverse().forEach((event, index) => {
+
             const li = document.createElement('li');
 
             const time = new Date(event.time).toLocaleTimeString();
 
-            li.textContent = `[${time}] ${event.type.toUpperCase()} ${
-                event.page || event.element || event.formId || ''
-            }`;
+            li.innerHTML = `
+                <span>
+                [${time}] ${event.type.toUpperCase()} 
+                ${event.page || event.element || event.formId || ''}
+                </span>
+
+                <button class="delete-event" data-index="${this.data.events.length - 1 - index}">
+                    
+                </button>
+            `;
 
             timeline.appendChild(li);
         });
     }
 }
+
 document.addEventListener('DOMContentLoaded', () => {
     new ActivityTracker();
 });
-
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = ActivityTracker;
-} else {
-    window.ActivityTracker = ActivityTracker;
-}
